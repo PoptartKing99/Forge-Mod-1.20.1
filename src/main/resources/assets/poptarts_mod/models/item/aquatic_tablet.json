@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "poptarts_mod:item/aquatic_tablet"
+  }
+}
