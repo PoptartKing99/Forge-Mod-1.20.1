@@ -1,10 +1,9 @@
 {
-  "parent": "minecraft:block/orientable",
   "textures": {
     "top": "poptarts_mod:block/forge_top_lit",
-    "front": "poptarts_mod:block/forge_front",
+    "front": "poptarts_mod:block/forge_front_lit",
     "side": "poptarts_mod:block/forge_side",
-    "bottom": "poptarts_mod:block/forge_bottom_lit",
+    "bottom": "poptarts_mod:block/forge_bottom",
     "particle": "poptarts_mod:block/forge_front_lit"
   },
   "elements": [

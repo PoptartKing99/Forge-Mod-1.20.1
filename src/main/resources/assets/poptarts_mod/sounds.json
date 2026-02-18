@@ -1,0 +1,11 @@
+{
+  "block.forge.crackle": {
+    "subtitle": "poptarts_mod.subtitles.forge.crackle",
+    "sounds": [
+      {
+        "name": "block.blastfurnace.fire_crackle",
+        "type": "event"
+      }
+    ]
+  }
+}

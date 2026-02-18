@@ -1,5 +1,4 @@
 {
-  "parent": "minecraft:block/orientable",
   "textures": {
     "top": "poptarts_mod:block/forge_top",
     "front": "poptarts_mod:block/forge_front",

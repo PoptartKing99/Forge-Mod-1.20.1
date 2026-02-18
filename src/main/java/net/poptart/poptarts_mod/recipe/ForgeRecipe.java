@@ -4,34 +4,31 @@ package net.poptart.poptarts_mod.recipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
-import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.RecipeMatcher;
 
-import java.util.List;
 
 public class ForgeRecipe extends AbstractForgeRecipe {
 
     private final ItemStack output;
     private final NonNullList<Ingredient> recipeItems;
     private final int cookTime;
-    private final boolean isSimple;
+
 
     public ForgeRecipe(ResourceLocation id, String group, ForgingBookCategory category, ItemStack output, NonNullList<Ingredient> recipeItems, int cookTime) {
         super(id, group, category, output, recipeItems, cookTime);
         this.output = output;
         this.recipeItems = recipeItems;
         this.cookTime = cookTime;
-        this.isSimple = recipeItems.stream().allMatch(Ingredient::isSimple);
+
     }
 
     @Override
@@ -40,51 +37,50 @@ public class ForgeRecipe extends AbstractForgeRecipe {
     }
 
     @Override
-    public boolean matches(Container pContainer, Level pLevel) {
-        // Check if output slot is already occupied with a different item
-        ItemStack outputSlot = pContainer.getItem(10);
-        if (!outputSlot.isEmpty() && !ItemStack.matches(this.output, outputSlot)) {
+    public boolean matches(Container container, Level level) {
+        // Output slot rules
+        ItemStack outputSlot = container.getItem(10);
+
+        if (!outputSlot.isEmpty() && !ItemStack.isSameItemSameTags(outputSlot, this.output)) {
             return false;
         }
 
-        // Check if output slot is full
         if (!outputSlot.isEmpty() && outputSlot.getCount() >= outputSlot.getMaxStackSize()) {
             return false;
         }
 
-        StackedContents stackedContents = new StackedContents();
-        List<ItemStack> inputs = new java.util.ArrayList<>();
-        int i = 0;
+        // Collect ALL input items (including duplicates)
+        NonNullList<ItemStack> inputs = NonNullList.create();
 
-        for (int j = 0; j < 9; ++j) {
-            ItemStack itemstack = pContainer.getItem(j);
-            if (!itemstack.isEmpty()) {
-                ++i;
-                if (isSimple)
-                    stackedContents.accountStack(itemstack, 1);
-                else inputs.add(itemstack);
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = container.getItem(i);
+            if (!stack.isEmpty()) {
+                inputs.add(stack.copyWithCount(1)); // only count 1 per slot per craft check
             }
         }
 
-        return i == this.recipeItems.size()
-                && (isSimple ? stackedContents.canCraft(this, (IntList) null)
-                : RecipeMatcher.findMatches(inputs, this.recipeItems) != null);
+        // If number of filled slots doesn't match ingredients, fail
+        if (inputs.size() != this.recipeItems.size()) {
+            return false;
+        }
+
+        // Now do shapeless matching
+        return RecipeMatcher.findMatches(inputs, this.recipeItems) != null;
     }
 
 
     @Override
     public ItemStack assemble(Container container, RegistryAccess registryAccess) {
-        return output;
-    }
-
-    @Override
-    public boolean canCraftInDimensions(int p_43999_, int p_44000_) {
-        return true;
+        return this.output.copy();
     }
 
     @Override
     public ItemStack getResultItem(RegistryAccess registryAccess) {
-        return null;
+        return this.output.copy();
+    }
+    @Override
+    public boolean canCraftInDimensions(int p_43999_, int p_44000_) {
+        return true;
     }
 
     @Override
@@ -145,11 +141,7 @@ public class ForgeRecipe extends AbstractForgeRecipe {
             buf.writeUtf(recipe.group);
             buf.writeEnum(recipe.category);
             buf.writeVarInt(recipe.recipeItems.size());
-
-            for(Ingredient ingredient : recipe.getIngredients()) {
-                ingredient.toNetwork(buf);
-            }
-
+            for(Ingredient ingredient : recipe.getIngredients()) {ingredient.toNetwork(buf);}
             buf.writeItem(recipe.getResultItem());
             buf.writeVarInt(recipe.cookTime);
 

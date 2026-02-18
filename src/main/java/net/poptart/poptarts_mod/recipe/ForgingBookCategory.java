@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 public enum ForgingBookCategory implements StringRepresentable {
 
+    SEARCH("search"),
     EQUIPMENT("equipment"),
     BUILDING("building"),
     MISC("misc");

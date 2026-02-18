@@ -7,6 +7,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraftforge.client.event.RegisterRecipeBookCategoriesEvent;
 import net.poptart.poptarts_mod.PoptartsMod;
+import net.poptart.poptarts_mod.item.ModItems;
 
 import java.util.List;
 import java.util.Map;
@@ -20,17 +21,22 @@ public class ModRecipeCategories {
             Suppliers.memoize(() -> RecipeBookCategories.create("FORGING_EQUIPMENT", new ItemStack(Items.IRON_AXE), new ItemStack(Items.GOLDEN_SWORD)));
     public static final Supplier<RecipeBookCategories> FORGING_BUILDING =
             Suppliers.memoize(() -> RecipeBookCategories.create("FORGING_BUILDING", new ItemStack(Items.CHAIN)));
+    public static final Supplier<RecipeBookCategories> FORGING_MISC =
+            Suppliers.memoize(() -> RecipeBookCategories.create("FORGING_MISC", new ItemStack(ModItems.BLANK_TABLET.get())));
+
     public static final Map<ForgingBookCategory, Supplier<RecipeBookCategories>> RECIPE_BOOK_TAB_SUPPLIERS = Map.of(
+            ForgingBookCategory.SEARCH, FORGING_SEARCH,
             ForgingBookCategory.EQUIPMENT, FORGING_EQUIPMENT,
-            ForgingBookCategory.BUILDING, FORGING_BUILDING
+            ForgingBookCategory.BUILDING, FORGING_BUILDING,
+            ForgingBookCategory.MISC, FORGING_MISC
     );
 
     public static void init(RegisterRecipeBookCategoriesEvent event) {
         event.registerBookCategories(PoptartsMod.FORGING_RECIPE_BOOK_TYPE,
-                List.of(FORGING_SEARCH.get(), FORGING_EQUIPMENT.get(), FORGING_BUILDING.get())
+                List.of(FORGING_SEARCH.get(), FORGING_EQUIPMENT.get(), FORGING_BUILDING.get(), FORGING_MISC.get())
         );
         event.registerAggregateCategory(FORGING_SEARCH.get(),
-                List.of(FORGING_EQUIPMENT.get(), FORGING_BUILDING.get())
+                List.of(FORGING_EQUIPMENT.get(), FORGING_BUILDING.get(), FORGING_MISC.get())
         );
         event.registerRecipeCategoryFinder(ModRecipes.FORGING_TYPE.get(), ModRecipeCategories::findForgingCategory);
     }
@@ -38,9 +44,11 @@ public class ModRecipeCategories {
     public static RecipeBookCategories findForgingCategory(Recipe<?> rawRecipe) {
         if (rawRecipe instanceof AbstractForgeRecipe recipe) {
             ForgingBookCategory tab = recipe.getCategory();
-            if (tab != null) return RECIPE_BOOK_TAB_SUPPLIERS.get(tab).get();
+
+            Supplier<RecipeBookCategories> supplier = RECIPE_BOOK_TAB_SUPPLIERS.get(tab);
+            if (supplier != null) return supplier.get();
         }
-        return FORGING_SEARCH.get();
+        return FORGING_MISC.get();
     }
 
 }

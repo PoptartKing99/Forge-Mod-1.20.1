@@ -8,7 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -83,15 +83,14 @@ public class ForgeShapedRecipe extends AbstractForgeRecipe implements IShapedRec
         return true;
     }
 
-    // --- Updated assemble methods for 1.20.1 ---
     @Override
-    public ItemStack assemble(Container container, net.minecraft.core.RegistryAccess registryAccess) {
-        return output.copy();
+    public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+        return this.output.copy();
     }
 
     @Override
-    public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess) {
-        return output.copy();
+    public ItemStack getResultItem(RegistryAccess registryAccess) {
+        return this.output.copy();
     }
 
     // --- IShapedRecipe methods ---
