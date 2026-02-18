@@ -1,0 +1,25 @@
+{
+  "type": "poptarts_mod:forging_shaped",
+  "category": "building",
+  "cooktime": 144,
+  "key": {
+    "X": {
+      "item": "minecraft:iron_nugget"
+    },
+    "#": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "X",
+    "#",
+    "X"
+  ],
+  "fuel": {
+    "item": "minecraft:coal"
+  },
+  "result": {
+    "item": "minecraft:chain",
+    "count": 9
+  }
+}
